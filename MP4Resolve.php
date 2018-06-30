@@ -26,16 +26,16 @@ class MP4Resolve
         return $n;
     }
 
-    private $fp;
 
     public function __construct($file)
     {
-        $this->fp = fopen($file, 'r');
-        if (!$this->fp) {
+        $fp = fopen($file, 'r');
+        if (!$fp) {
             throw new Exception("No file found!");
         }
-        $this->initFtyp();
-        $this->initMvhd();
+        $this->initFtyp($fp);
+        $this->initMvhd($fp);
+        fclose($fp);
     }
 
     private $ftyp_box_data;
@@ -47,10 +47,8 @@ class MP4Resolve
         "minor_version" => [0, 4],
     ];
 
-    private function initFtyp()
+    private function initFtyp($f)
     {
-        $f = $this->fp;
-
         $result = [];
         foreach (self::$FTYP_STRUCT as $index => $item) {
             $data = fread($f, $item[1]);
@@ -97,16 +95,9 @@ class MP4Resolve
 
     private $mvhd_box_data;
 
-    private function passOfMvhd()
+    private function initMvhd($f)
     {
-        $f = $this->fp;
         fseek($f, 8, SEEK_CUR);
-    }
-
-    private function initMvhd()
-    {
-        $this->passOfMvhd();
-        $f = $this->fp;
         $result = [];
         foreach (self::$MVHD_STRUCT as $index => $item) {
             $data = fread($f, $item[1]);
