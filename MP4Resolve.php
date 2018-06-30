@@ -13,6 +13,7 @@ use Exception;
 class MP4Resolve
 {
 
+
     const TYPE_INT = 0;
     const TYPE_STR = 1;
 
